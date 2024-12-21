@@ -2,11 +2,19 @@
 const express=require("express"                                                                                                                   );
 const app=express()
 
-app.use("/test",(req,res)=>{
-    res.send("hello from server...")
+app.get("/user",(req,res)=>{
+    res.send({firstname:"vandana",lastname:"datti"})
 })
-app.use("/hello",(req,res)=>{
-    res.send("hii from server...")
+app.post("/user",(req,res)=>{
+    res.send("data succesfully posted")
+})
+
+app.delete("/user",(req,res)=>{
+    res.send("deleted succesfully...")
+})
+
+app.use("/user",(req,res)=>{
+    res.send("succesfully done api ..handles all calls")
 })
 
 app.listen(7777,()=>{
