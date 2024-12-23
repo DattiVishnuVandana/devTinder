@@ -1,36 +1,28 @@
-// console.log("1 st time creating server...");
-const express=require("express"                                                                                                                   );
+
+const express=require("express") ;      
+
+const {adminAuth,userAuth}=require("./auth") ;
+                                                                                               
 const app=express()
-
-app.use("/",(req,res,next)=>{
-console.log("passing");
-// res.send("0")
-next()
-console.log("done 0");
+app.use("/admin",adminAuth)
+app.use("/admin/getData",(req,res)=>{
+    res.send("send data")
 })
-app.get("/user",[[(req,res,next)=>{
-
-    console.log("route handler1");
-    // res.send("1")
-    next()
-    console.log("termination1");
-    
-},(req,res,next)=>{
-
-    console.log("route handler2");
-    // res.send("1")
-    next()
-    console.log("termination2");
-    
-}],
-(req,res,next)=>{
-
-    console.log("route handler3");
-    res.send("3")
+app.use("/user/login",(req,res,next)=>{
+    console.log("1st one");
+    res.send("user is authenticated login")
     // next()
-    console.log("termination3");
-    
-}])
+})
+
+app.use("/user/data",userAuth,(req,res,next)=>{
+    console.log("2nd one");
+    res.send("user is authenticated")
+})
+
+app.use("/admin/delete",(req,res)=>{
+    res.send("deleted data")
+})
 app.listen(7777,()=>{
     console.log("server is succesfully running in port 7777..");
 })
+
