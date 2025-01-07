@@ -1,22 +1,55 @@
-
-const express=require("express") ;      
+const express=require('express')
 const app=express()
+const connectDB=require("../config/database");
+const mongoose= require('mongoose');
+const userSchema = require('./model/user');
 
-app.use("/user/login",(req,res)=>{
+app.use(express.json())
+
+app.use("/get",async (req,res)=>{
+    const userEmail=req.body.email
+    const surName=req.body.lastName
     try{
-    throw new Error("rthg");
-    res.send("done")
-    }catch(err){
-        res.status(500).send("something wrong in  u r code")
+ const user = await Usermodel.findOne({
+    // email:userEmail
+    lastName:surName
+ })
+ if(user.length===0){
+    res.status(404).send("user not found")
+ }
+ else{
+ console.log(user);
+ res.send(user)}
+    }
+    catch(err){
+        res.status(404).send("something went wrong")
     }
 })
-// app.use("/",(err,req,res,next)=>{
-//     if(err){
-//         res.status(500).send("something went wrong...")
-//     }
-// })
 
-app.listen(7777,()=>{
-    console.log("server is succesfully running in port 7777..");
+app.post('/signup',async (req,res)=>{
+    console.log(req.body);
+const userObj=req.body
+const user=new Usermodel(userObj)
+ try{
+await user.save()
+
+res.send("user succesfully added")
+}
+catch(err){
+    res.status(400).send("error occured")
+}
+}
+)
+
+connectDB().then(()=>{
+    console.log("connection succesfully established");
+    app.listen(7777,()=>{
+        console.log("server is listening on 7777");
+    })
+})
+.catch(()=>{
+    console.log("database cannot be established");
 })
 
+const Usermodel=mongoose.model('Users',userSchema)
+module.exports=Usermodel
