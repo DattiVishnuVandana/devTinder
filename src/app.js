@@ -64,11 +64,21 @@ app.delete("/deluser",async(req,res)=>{
     }
 })
 
-app.patch("/updateuser",async (req,res)=>{
+app.patch("/updateuser/:userId",async (req,res)=>{
     try{
-        const userId=req.body.userId
+        const ALLOWED_UPDATES=["photoUrl","skills","lastName","age","gender","about"]
+        
+        const userId=req.params.userId
         const emailId=req.body.email
         const data=req.body
+        if(data?.skills.length>10){
+            throw new Error("limit exceeeded for skills")
+        }
+        const isUpdateAllowed=Object.keys(data).every(k=>  ALLOWED_UPDATES.includes(k))
+        console.log(isUpdateAllowed)
+        if(!isUpdateAllowed){
+ throw new Error("update not allowed")
+        }
         // const updateduser=await Usermodel.findOneAndUpdate({email:emailId},data,
         const updateduser=await Usermodel.findByIdAndUpdate(userId,data,
             {

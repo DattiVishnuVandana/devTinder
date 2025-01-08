@@ -1,5 +1,5 @@
 const mongoose=require('mongoose')
-
+const validator=require('validator')
 const userSchema=mongoose.Schema(
     {
         firstName:{
@@ -28,7 +28,8 @@ const userSchema=mongoose.Schema(
             unique:true,
             lowercase:true,
             trim:true,
-            maxlength:60
+            maxlength:60,
+            
         },
         password:{
             type:String,
