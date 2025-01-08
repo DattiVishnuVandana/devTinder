@@ -49,7 +49,20 @@ catch(err){
 }
 }
 )
+app.delete("/deluser",async(req,res)=>{
+    try{
 
+    const userId= req.body.userId
+    console.log(userId);
+    const deluser=await Usermodel.findByIdAndDelete(userId)
+    console.log(deluser);
+    res.send("user deleted succesfully")
+
+    }
+    catch(err){
+        res.status(400).send("something went wrong")
+    }
+})
 
 
 connectDB().then(()=>{
