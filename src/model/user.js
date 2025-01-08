@@ -29,14 +29,28 @@ const userSchema=mongoose.Schema(
             lowercase:true,
             trim:true,
             maxlength:60,
-            
+            validate(value){
+                if(!validator.isEmail(value)){
+                    throw new Error("email is not vallid")
+                }
+            }
         },
         password:{
             type:String,
-            required:true
+            required:true,
+            validate(value){
+                if(!validator.isStrongPassword(value)){
+                    throw new Error("please make sure u r password should be strong")
+                }
+            }
         },
         photoUrl:{
-        type:String
+        type:String,
+        validate(value){
+            if(!validator.isURL(value)){
+                throw new Error("please upload correct link")
+            }
+        }
     },
     about:{
         type:String,
