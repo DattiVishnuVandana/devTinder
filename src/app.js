@@ -45,7 +45,7 @@ await user.save()
 res.send("user succesfully added")
 }
 catch(err){
-    res.status(400).send("error occured")
+    res.status(400).send("error occured"+err)
 }
 }
 )
@@ -69,15 +69,18 @@ app.patch("/updateuser",async (req,res)=>{
         const userId=req.body.userId
         const emailId=req.body.email
         const data=req.body
-        const updateduser=await Usermodel.findOneAndUpdate({email:emailId},data,{
-            returnDocument:"after"
+        // const updateduser=await Usermodel.findOneAndUpdate({email:emailId},data,
+        const updateduser=await Usermodel.findByIdAndUpdate(userId,data,
+            {
+            returnDocument:"after",
+            runValidators:true
         })
         console.log(updateduser);
         res.send("user updated succesfully")
 
     }
     catch(err){
-        res.status(400).send("something went wrong")
+        res.status(400).send("something went wrong"+err)
     }
 })
 connectDB().then(()=>{
