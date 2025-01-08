@@ -6,7 +6,7 @@ const userSchema = require('./model/user');
 
 app.use(express.json())
 
-app.use("/get",async (req,res)=>{
+app.get("/get",async (req,res)=>{
     const userEmail=req.body.email
     const surName=req.body.lastName
     try{
@@ -26,6 +26,15 @@ app.use("/get",async (req,res)=>{
     }
 })
 
+
+app.get("/feed",async (req,res)=>{
+  try{ const users=await Usermodel.find({})
+    console.log(users);
+    res.send(users)}
+    catch(err){
+        res.send("something went wrong")
+    }
+})
 app.post('/signup',async (req,res)=>{
     console.log(req.body);
 const userObj=req.body
@@ -40,6 +49,8 @@ catch(err){
 }
 }
 )
+
+
 
 connectDB().then(()=>{
     console.log("connection succesfully established");
