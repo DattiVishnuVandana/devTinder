@@ -64,7 +64,22 @@ app.delete("/deluser",async(req,res)=>{
     }
 })
 
+app.patch("/updateuser",async (req,res)=>{
+    try{
+        const userId=req.body.userId
+        const emailId=req.body.email
+        const data=req.body
+        const updateduser=await Usermodel.findOneAndUpdate({email:emailId},data,{
+            returnDocument:"after"
+        })
+        console.log(updateduser);
+        res.send("user updated succesfully")
 
+    }
+    catch(err){
+        res.status(400).send("something went wrong")
+    }
+})
 connectDB().then(()=>{
     console.log("connection succesfully established");
     app.listen(7777,()=>{
