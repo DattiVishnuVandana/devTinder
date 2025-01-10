@@ -3,6 +3,8 @@ const app=express()
 const connectDB=require("../config/database");
 const mongoose= require('mongoose');
 const userSchema = require('./model/user');
+const ValidateSignUpData = require('./utils/validate');
+const bcrypt=require('bcrypt')
 
 app.use(express.json())
 
@@ -32,23 +34,39 @@ app.get("/feed",async (req,res)=>{
     console.log(users);
     res.send(users)}
     catch(err){
-        res.send("something went wrong")
-    }
+        res.send("something went wrong")}
+   
 })
-app.post('/signup',async (req,res)=>{
-    console.log(req.body);
-const userObj=req.body
-const user=new Usermodel(userObj)
- try{
-await user.save()
 
-res.send("user succesfully added")
-}
-catch(err){
-    res.status(400).send("error occured"+err)
-}
-}
-)
+app.post('/signup', async (req, res) => {
+    const { firstName, lastName, email, password } = req.body;
+
+    // Validate the input data first
+    try {
+        ValidateSignUpData(req); // This will throw an error if validation fails
+        console.log("Validation passed");
+
+        // Hash the password after validation
+        const pswdhashed = await bcrypt.hash(password, 10);
+
+        // Create the user object
+        const user = new Usermodel({
+            firstName:firstName,
+            lastName:lastName,
+            email:email,
+            password: pswdhashed
+        });
+
+        // Save the user to the database
+        await user.save();
+
+        res.send("User successfully added");
+    } catch (err) {
+        console.error(err); // Log the error for debugging
+        res.status(400).send("Error occurred: " + err.message);
+    }
+});
+
 app.delete("/deluser",async(req,res)=>{
     try{
 
