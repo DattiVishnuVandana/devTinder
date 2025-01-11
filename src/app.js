@@ -67,6 +67,30 @@ app.post('/signup', async (req, res) => {
     }
 });
 
+app.post("/login",async (req,res)=>{
+    try{
+const {email,password}=req.body
+const user =await Usermodel.findOne({email:email})
+console.log(user);
+if(!user){
+    throw new Error("email is not in db")
+}
+const isPasswordValid=await bcrypt.compare(password,user.password)
+if(isPasswordValid){
+    res.send("login succesfull...|||")
+
+}
+else{
+   
+    throw new Error("password is incorrecct...||")
+}
+    }
+    catch(err){
+       res.status(400).send("err"+err)
+    }
+})
+
+
 app.delete("/deluser",async(req,res)=>{
     try{
 
