@@ -2,44 +2,15 @@ const express=require('express')
 const app=express()
 const connectDB=require("../config/database");
 const mongoose= require('mongoose');
-const userSchema = require('./model/user');
+const {userSchema }= require('./model/user');
 const ValidateSignUpData = require('./utils/validate');
 const bcrypt=require('bcrypt')
 const cookieParser=require('cookie-parser')
 const jwt=require("jsonwebtoken")
+const {userAuth}=require('./auth')
 
 app.use(express.json())
 app.use(cookieParser())
-
-app.get("/get",async (req,res)=>{
-    const userEmail=req.body.email
-    const surName=req.body.lastName
-    try{
- const user = await Usermodel.findOne({
-    // email:userEmail
-    lastName:surName
- })
- if(user.length===0){
-    res.status(404).send("user not found")
- }
- else{
- console.log(user);
- res.send(user)}
-    }
-    catch(err){
-        res.status(404).send("something went wrong")
-    }
-})
-
-
-app.get("/feed",async (req,res)=>{
-  try{ const users=await Usermodel.find({})
-    console.log(users);
-    res.send(users)}
-    catch(err){
-        res.send("something went wrong")}
-   
-})
 
 app.post('/signup', async (req, res) => {
     const { firstName, lastName, email, password } = req.body;
@@ -70,6 +41,36 @@ app.post('/signup', async (req, res) => {
     }
 });
 
+app.get("/get",async (req,res)=>{
+    const userEmail=req.body.email
+    const surName=req.body.lastName
+    try{
+ const user = await Usermodel.findOne({
+    // email:userEmail
+    lastName:surName
+ })
+ if(user.length===0){
+    res.status(404).send("user not found")
+ }
+ else{
+ console.log(user);
+ res.send(user)}
+    }
+    catch(err){
+        res.status(404).send("something went wrong")
+    }
+})
+
+
+app.get("/feed",userAuth,async (req,res)=>{
+  try{ const users=await Usermodel.find({})
+    console.log(users);
+    res.send(users)}
+    catch(err){
+        res.send("something went wrong")}
+   
+})
+
 app.post("/login",async (req,res)=>{
     try{
 const {email,password}=req.body
@@ -80,11 +81,11 @@ if(!user){
 }
 const isPasswordValid=await bcrypt.compare(password,user.password)
 if(isPasswordValid){
-    const token=await jwt.sign({_id:user._id},"DEV@TINDER$790")
+    const token=await jwt.sign({_id:user._id},"DEV@TINDER$790",{expiresIn:"7d"})
 console.log(token);
 
 
-    res.cookie("token",token)
+    res.cookie("token",token,{expires:new Date(Date.now()+7*3600000)})
 
     res.send("login succesfull...|||")
 
@@ -100,16 +101,16 @@ else{
     }
 })
 
-app.get("/profile",async (req,res)=>{
-    const cookies=await req.cookies
-    console.log(cookies);
-    const {token}=cookies
-    const decodedMsg=await jwt.verify(token,"DEV@TINDER$790")
-console.log(decodedMsg);
-const {_id}=decodedMsg
-console.log("logged user:"+_id);
-const user =await Usermodel.findById(_id)
-    res.send(user)
+app.get("/profile",userAuth,async (req,res)=>{
+//     const cookies=await req.cookies
+//     console.log(cookies);
+//     const {token}=cookies
+//     const decodedMsg=await jwt.verify(token,"DEV@TINDER$790")
+// console.log(decodedMsg);
+// const {_id}=decodedMsg
+// console.log("logged user:"+_id);
+// const user =await Usermodel.findById(_id)
+    res.send(req.user)
 })
 
 app.delete("/deluser",async(req,res)=>{
@@ -156,6 +157,14 @@ app.patch("/updateuser/:userId",async (req,res)=>{
         res.status(400).send("something went wrong"+err)
     }
 })
+
+app.post('/sendconnection',userAuth,(req,res)=>{
+    const user=req.user
+    console.log("connection request was sent ");
+    res.send(user.firstName+"sent request")
+})
+
+
 connectDB().then(()=>{
     console.log("connection succesfully established");
     app.listen(7777,()=>{
