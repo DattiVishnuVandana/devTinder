@@ -5,8 +5,11 @@ const mongoose= require('mongoose');
 const userSchema = require('./model/user');
 const ValidateSignUpData = require('./utils/validate');
 const bcrypt=require('bcrypt')
+const cookieParser=require('cookie-parser')
+const jwt=require("jsonwebtoken")
 
 app.use(express.json())
+app.use(cookieParser())
 
 app.get("/get",async (req,res)=>{
     const userEmail=req.body.email
@@ -71,14 +74,21 @@ app.post("/login",async (req,res)=>{
     try{
 const {email,password}=req.body
 const user =await Usermodel.findOne({email:email})
-console.log(user);
+// console.log(user);
 if(!user){
     throw new Error("email is not in db")
 }
 const isPasswordValid=await bcrypt.compare(password,user.password)
 if(isPasswordValid){
+    const token=await jwt.sign({_id:user._id},"DEV@TINDER$790")
+console.log(token);
+
+
+    res.cookie("token",token)
+
     res.send("login succesfull...|||")
 
+     
 }
 else{
    
@@ -90,6 +100,17 @@ else{
     }
 })
 
+app.get("/profile",async (req,res)=>{
+    const cookies=await req.cookies
+    console.log(cookies);
+    const {token}=cookies
+    const decodedMsg=await jwt.verify(token,"DEV@TINDER$790")
+console.log(decodedMsg);
+const {_id}=decodedMsg
+console.log("logged user:"+_id);
+const user =await Usermodel.findById(_id)
+    res.send(user)
+})
 
 app.delete("/deluser",async(req,res)=>{
     try{
