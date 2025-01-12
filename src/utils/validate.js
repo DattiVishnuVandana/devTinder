@@ -14,4 +14,16 @@ const ValidateSignUpData = (req) => {
     }
 };
 
-module.exports = ValidateSignUpData;
+const ValidateProfileEditData=(req)=>{
+    const allowedEdit=["firstName","lastName","age","gender","skills","about","photoUrl"]
+  const isAllow=Object.keys(req.body).every(k=>allowedEdit.includes(k))
+return isAllow
+}
+
+const ValidateProfilepasswordData=(req)=>{
+    const allowedEdit=["password"]
+    const isAllow=Object.keys(req.body).every(k=>allowedEdit.includes(k))
+  return isAllow
+  
+}
+module.exports ={ ValidateSignUpData,ValidateProfileEditData,ValidateProfilepasswordData}
