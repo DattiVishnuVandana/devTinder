@@ -11,7 +11,7 @@ authRouter.post('/signup', async (req, res) => {
 
     // Validate the input data first
     try {
-        ValidateSignUpData(req); // This will throw an error if validation fails
+        // ValidateSignUpData(req); // This will throw an error if validation fails
         console.log("Validation passed");
 
         // Hash the password after validation

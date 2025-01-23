@@ -16,11 +16,12 @@ app.use(cookieParser())
 const reqRoute=require('./Routers/Request')
 const profile=require('./Routers/profileRoute')
 const authRouter=require('./Routers/authRouter')
-
+const userRouter=require('./Routers/user')
 
 app.use("/",authRouter)
 app.use("/",profile)
  app.use("/",reqRoute)
+ app.use("/",userRouter)
 
 
 
