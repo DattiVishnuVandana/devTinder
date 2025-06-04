@@ -6,8 +6,11 @@ const userAuth=async (req,res,next)=>{
   try{ 
      const cookies=req.cookies
     const {token}=cookies
-
-    const decodedMsg=await jwt.verify(token,"DEV@TINDER$790")
+    
+    const decodedMsg=await jwt.verify(token,"DEV@TINDER$790");
+    if(!token){
+      res.status(401).send("please login")
+     }
    console.log(decodedMsg);
    const {_id}=decodedMsg
    console.log("logged user:"+_id);

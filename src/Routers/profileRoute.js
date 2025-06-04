@@ -6,7 +6,7 @@ const {userAuth}=require('../auth')
 const {userSchema,Usermodel }= require('../model/user');
 
 profileRoute.get("/profile",userAuth,async (req,res)=>{
- 
+  
         res.send(req.user)
     })
 

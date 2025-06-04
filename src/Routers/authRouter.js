@@ -7,8 +7,8 @@ const {userSchema,Usermodel }= require('../model/user');
 
 
 authRouter.post('/signup', async (req, res) => {
-    const { firstName, lastName, email, password } = req.body;
-
+    const { firstName, lastName, email, password,photoUrl } = req.body;
+  console.log("reqyuest....."+req.body);
     // Validate the input data first
     try {
         // ValidateSignUpData(req); // This will throw an error if validation fails
@@ -22,7 +22,8 @@ authRouter.post('/signup', async (req, res) => {
             firstName:firstName,
             lastName:lastName,
             email:email,
-            password: pswdhashed
+            password: pswdhashed,
+            photoUrl:photoUrl
         });
 
         // Save the user to the database
@@ -47,12 +48,13 @@ if(!user){
 const isPasswordValid=await  user.validatePassword(password)
 if(isPasswordValid){
     const token=await user.getJWT()
-console.log(token);
+// console.log(token);
 
 
     res.cookie("token",token,{expires:new Date(Date.now()+7*3600000)})
 
-    res.send("login succesfull...|||")
+    // res.send(`${user} login succesfull...|||`)
+    res.send(user)
 
      
 }
