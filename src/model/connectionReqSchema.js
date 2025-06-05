@@ -14,7 +14,7 @@ toUserId:{
 status:{
     type:String,
     enum:{
-values:["ignore","interested","accepted","rejected"],
+values:["ignored","interested","accepted","rejected"],
 msg:"{VALUE} is incorrect status"
     }
 

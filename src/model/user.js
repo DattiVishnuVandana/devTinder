@@ -18,7 +18,7 @@ const userSchema=mongoose.Schema(
         },
         gender:{
             type:String,
-            default:" ",
+            // default:" ",
             validate(value){
                 if (!['male', 'female', 'others'].includes(value)) {
                     throw new Error("Gender is not valid");
@@ -50,16 +50,18 @@ const userSchema=mongoose.Schema(
         },
         photoUrl:{
         type:String,
-        default:"https://th.bing.com/th/id/OIP.E3h4sPQnazsw5FrbmTnArAHaHa?w=194&h=194&c=7&r=0&o=5&dpr=1.3&pid=1.7",
+        default:"https://wallpapers-clan.com/wp-content/uploads/2022/08/default-pfp-18.jpg",
+       
         validate(value){
             if(!validator.isURL(value)){
                 throw new Error("please upload correct link")
             }
         }
+        
     },
     about:{
         type:String,
-        default:"this is an about section ..you can add or update u r bio "
+        default:" "
     },
     skills:{
         type:[String]

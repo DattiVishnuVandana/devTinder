@@ -1,4 +1,5 @@
 const express=require('express')
+const mongoose=require('mongoose')
 
 const {ValidateProfileEditData,ValidateProfilepasswordData}=require('../utils/validate')
 const profileRoute=express.Router()
@@ -18,23 +19,34 @@ profileRoute.patch("/updateuser/:userId",async (req,res)=>{
             const userId=req.params.userId
             const emailId=req.body.email
             const data=req.body
-            if(data?.skills.length>10){
+            console.log("....1");
+            if(data?.skills?.length>10){
                 throw new Error("limit exceeeded for skills")
             }
+            if(!mongoose.Types.ObjectId.isValid(userId)){
+              console.log("inc");
+   return res.status(400).send("Invalid userId");
+
+}else console.log("valid");
+
+
+            console.log("....25");
             const isUpdateAllowed=Object.keys(data).every(k=>  ALLOWED_UPDATES.includes(k))
             console.log(isUpdateAllowed)
+            console.log("....2");
             if(!isUpdateAllowed){
      throw new Error("update not allowed")
             }
-            // const updateduser=await Usermodel.findOneAndUpdate({email:emailId},data,
+            console.log("....5");
             const updateduser=await Usermodel.findByIdAndUpdate(userId,data,
                 {
                 returnDocument:"after",
                 runValidators:true
             })
             console.log(updateduser);
-            res.send("user updated succesfully")
-    
+            res.json(updateduser)
+
+    console.log("....13");
         }
         catch(err){
             res.status(400).send("something went wrong"+err)
@@ -85,25 +97,53 @@ profileRoute.delete("/deluser",async(req,res)=>{
        
     })
 
-profileRoute.patch("/profile/edit",userAuth,async(req,res)=>{
-  try{if(! ValidateProfileEditData(req)){
-    throw new Error("not allowed to edit")
-    
-  }}
-  catch(err){
-    res.status(400).send(err)
+// profileRoute.patch("/profile/edit", userAuth, async (req, res) => {
+//   try {
+//     // Validate incoming fields
+//     if (!ValidateProfileEditData(req)) {
+//       throw new Error("Not allowed to edit");
+//     }
+
+//     const loggedInUser = req.user;
+//     console.log("Logged in user:", loggedInUser);
+
+//     // Update only allowed fields
+//     Object.keys(req.body).forEach((key) => {
+//       loggedInUser[key] = req.body[key];
+//     });
+
+//     // Save changes to DB
+//     await loggedInUser.save();
+
+//     res.json({
+//       msg: `${loggedInUser.firstName}, your profile was updated successfully`,
+//       data: loggedInUser,
+//     });
+//   } catch (err) {
+//     res.status(400).send({ error: err.message });
+//   }
+// });
+profileRoute.patch("/profile/edit", userAuth, async (req, res) => {
+  try {
+    console.log("REQ BODY", req.body);
+    console.log("REQ USER", req.user);
+
+    Object.keys(req.body).forEach((key) => {
+      req.user[key] = req.body[key];
+    });
+
+    await req.user.save();
+
+    res.json({
+      msg: `${req.user.firstName}, your profile was updated successfully`,
+      data: req.user,
+    });
+  } catch (err) {
+    console.log("Backend error:", err.message);
+    res.status(400).send({ error: err.message });
   }
- const loggedInUser=req.user
- console.log(loggedInUser);
-//  loggedInUser.firstName=req.body.firstName
+});
 
-Object.keys(req.body).forEach(key=>loggedInUser[key]=req.body[key])
-await loggedInUser.save()
-
-   res.json({msg:loggedInUser.firstName+"u r profile updated",
-    data:loggedInUser
-   })
-})
 
 profileRoute.patch("/profile/password",userAuth,async(req,res)=>{
     try{if(! ValidateProfilepasswordData(req)){

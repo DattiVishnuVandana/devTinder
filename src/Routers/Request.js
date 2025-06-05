@@ -7,47 +7,48 @@ const {userSchema,Usermodel }= require('../model/user');
 
 
 
-RequestRoute.post('/connectionReq/send/:status/:toUserId',userAuth,async (req,res)=>{
-    const fromUserId=req.user._id
-    const toUserId=req.params.toUserId
-    const status=req.params.status
-try{
-    const allowedStatus=["ignored","interested"]
-    if(!allowedStatus.includes(status)){
-return res.status(400).json({msg:"invalid status type"+status})
-    }
+// RequestRoute.post('/connectionReq/send/:status/:toUserId',userAuth,async (req,res)=>{
+//     const fromUserId=req.user._id
+//     const toUserId=req.params.toUserId
+//     const status=req.params.status
+// try{
+//     const allowedStatus=["ignored","interested"]
+//     if(!allowedStatus.includes(status)){
+// return res.status(400).json({msg:"invalid status type"+status})
+//     }
 
 
-console.log("..");
-    const connReq = new connReqModel({
-        fromUserId:fromUserId,
-        toUserId:toUserId,
-        status:status
-    });
+// console.log("..");
+//     const connReq = new connReqModel({
+//         fromUserId:fromUserId,
+//         toUserId:toUserId,
+//         status:status
+//     });
 
-console.log(connReq);
-    // const existingReq=await connReqModel.findOne({
-    //     $or:[
-    //         {fromUserId,toUserId},
-    //         {fromUserId:toUserId,toUserId:fromUserId}
-    //     ]
-    // })
-    // if(existingReq){
-    //     return res.status(400).send("user already exists ...")
-    // }
-    // const User=await Usermodel.findById(toUserId)
-    // if(User){
-    //     return res.send(User)
-    // }
-    const data=await connReq.save()
-    console.log("data"+data)
-    res.send({
-        msg:"connection req sent succesfully",
-        data
-    })}catch(err){
-        res.status(400).send("somme issue"+err)
-    }
-})
+// console.log(connReq);
+//     // const existingReq=await connReqModel.findOne({
+//     //     $or:[
+//     //         {fromUserId,toUserId},
+//     //         {fromUserId:toUserId,toUserId:fromUserId}
+//     //     ]
+//     // })
+//     // if(existingReq){
+//     //     return res.status(400).send("user already exists ...")
+//     // }
+//     // const User=await Usermodel.findById(toUserId)
+//     // if(User){
+//     //     return res.send(User)
+//     // }
+//     const data=await connReq.save()
+//     console.log("data"+data)
+//     res.send({
+//         msg:"connection req sent succesfully",
+//         data
+//     })}catch(err){
+//         res.status(400).send("somme issue"+err)
+//     }
+// })
+
 
 
 // RequestRoute.post("/connectionReq/review/:status/:reqId",userAuth,async(req,res)=>{
@@ -79,6 +80,50 @@ console.log(connReq);
 // }
 // })
 
+RequestRoute.post('/connectionReq/send/:status/:toUserId', userAuth, async (req, res) => {
+    const fromUserId = req.user._id;
+    const toUserId = req.params.toUserId;
+    const status = req.params.status;
+
+    try {
+        const allowedStatus = ["ignored", "interested"];
+        if (!allowedStatus.includes(status)) {
+            return res.status(400).json({ msg: "Invalid status type: " + status });
+        }
+
+        // Prevent sending request to self
+        if (fromUserId.toString() === toUserId.toString()) {
+            return res.status(400).json({ error: "Cannot send request to yourself" });
+        }
+
+        // Check for existing request in either direction
+        // const existingReq = await connReqModel.findOne({
+        //     $or: [
+        //         { fromUserId, toUserId },
+        //         { fromUserId: toUserId, toUserId: fromUserId }
+        //     ]
+        // });
+
+        // if (existingReq) {
+        //     return res.status(400).json({ msg: "Connection request already exists" });
+        // }
+
+        const connReq = new connReqModel({
+            fromUserId,
+            toUserId,
+            status
+        });
+
+        const data = await connReq.save();
+        res.send({
+            msg: "Connection request sent successfully",
+            data
+        });
+
+    } catch (err) {
+        res.status(500).json({ error: "Internal server error", details: err.message });
+    }
+});
 
 RequestRoute.post("/connectionReq/review/:status/:reqId", userAuth, async (req, res) => {
     try {

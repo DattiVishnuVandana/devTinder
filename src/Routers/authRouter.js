@@ -8,7 +8,8 @@ const {userSchema,Usermodel }= require('../model/user');
 
 authRouter.post('/signup', async (req, res) => {
     const { firstName, lastName, email, password,photoUrl } = req.body;
-  console.log("reqyuest....."+req.body);
+   
+
     // Validate the input data first
     try {
         // ValidateSignUpData(req); // This will throw an error if validation fails
@@ -27,9 +28,14 @@ authRouter.post('/signup', async (req, res) => {
         });
 
         // Save the user to the database
-        await user.save();
+        const savedUser=await user.save();
+ const token=await savedUser.getJWT();
+ res.cookie("token",token,{
+    expires:new Date(Date.now()+8*3600000)
+ })
+        res.json({message:"User successfully added",
+            data:savedUser});
 
-        res.send("User successfully added");
     } catch (err) {
         console.error(err); // Log the error for debugging
         res.status(400).send("Error occurred: " + err.message);
