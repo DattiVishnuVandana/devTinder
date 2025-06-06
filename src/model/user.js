@@ -57,7 +57,7 @@ const userSchema=mongoose.Schema(
                 throw new Error("please upload correct link")
             }
         }
-        
+           
     },
     about:{
         type:String,
